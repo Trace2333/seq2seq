@@ -79,9 +79,19 @@ print(A[-1].size())
 print((A.split(1, dim=1)[-1]).argmax(2))"""
 
 
-class argparse():
-    """放置参数"""
+"""class argparse():
     pass
 argparse.seed = 42
 print(argparse)
-print(argparse.seed)
+print(argparse.seed)"""
+
+import torch.nn as nn
+rnncell = nn.RNNCell(input_size=300, hidden_size=300, nonlinearity='tanh', bias=True)
+# 所有的四个参数,没有batch_first
+x = torch.randn([16, 30, 300])
+x = x.permute(1, 0, 2)
+# x-->【length， batch， vecsize】， [30, 16, 300]
+hidden = torch.randn([16, 300])
+out = rnncell(x[0], hidden)
+print(out.size())
+print(x[0].size())

@@ -2,7 +2,6 @@ import logging
 import os
 import torch
 import wandb
-import torch.nn as nn
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 from evaluate_tools import rouge1, acc_metrics

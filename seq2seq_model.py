@@ -45,13 +45,14 @@ class decoderBase(nn.Module):
         self.hiddenSize = hiddenSize
         self.inputSize = inputSize
         self.batchSize = batchSize
-        self.recurrent = nn.RNN(inputSize, hiddenSize, batch_first=True, bidirectional=True, num_layers=numLayers)
-        self.linear = nn.Linear(in_features=hiddenSize * 2, out_features=dictLen)
+        self.recurrent = nn.RNNCell(inputSize, hiddenSize, nonlinearity='tanh', bias=True)
+        self.linear = nn.Linear(in_features=hiddenSize, out_features=dictLen)
 
     def forward(self, x, state):
         """前向计算"""
-        out, state = self.recurrent(x, state)
-        y = self.linear(out)
+        out = self.recurrent(x, state)
+        state = out
+        y = self.linear(out.unsqueeze(0).permute(1, 0, 2))
         return y, state
 
     def initZeroState(self):
@@ -78,21 +79,22 @@ class seq2seqBase(nn.Module):
         self.ZH = nn.Parameter(embwZH)
         self.batchsize = batchSize
 
-    def forward(self, x, y, ifEval=False, start_TF_rate=0.2):
+    def forward(self, x, y, ifEval=False, start_TF_rate=1):
         """前向计算"""
         if ifEval is not True:
             x = nn.functional.embedding(torch.tensor(x).long().to(device), self.EN)
             y = nn.functional.embedding(torch.tensor(y).long().to(device), self.ZH)
             x = x.to(torch.float32)
             y = y.to(torch.float32)
-            y_in = torch.split(y, 1, dim=1)
+            y_in = y.permute(1, 0, 2)
             output1, c = self.encoder(x)
+            c = c[1]
             out, c = self.decoder(y_in[0], c)
             for i in y_in[1:]:
                 if start_TF_rate < random.uniform(0, 1):    # All teacher forcing
                     p, c = self.decoder(i, c)
                 else:
-                    p, c = self.decoder(nn.functional.embedding((out.split(1, dim=1)[-1]).argmax(2), self.ZH), c)
+                    p, c = self.decoder(c, c)
                 out = torch.cat((out, p), dim=1)
             return out
         if ifEval:
