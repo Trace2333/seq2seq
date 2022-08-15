@@ -1,0 +1,7 @@
+cs_en\
+wandb\
+word2vec\
+*.pth
+embw\
+__pycache__\
+.idea\
