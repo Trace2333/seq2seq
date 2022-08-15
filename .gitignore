@@ -1,7 +1,8 @@
-cs_en\
-wandb\
-word2vec\
+cs_en/
+wandb/
+word2vec/
 *.pth
-embw\
-__pycache__\
-.idea\
+embw/
+__pycache__/
+.idea/
+datasets/
