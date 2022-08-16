@@ -92,9 +92,9 @@ class seq2seqBase(nn.Module):
             out, c = self.decoder(y_in[0], c)
             for i in y_in[1:]:
                 if start_TF_rate > random.uniform(0, 1):    # All teacher forcing
-                    p, c = self.decoder(i, c)
+                    p, hidden = self.decoder(i, c)
                 else:
-                    p, c = self.decoder(c, c)
+                    p, hidden = self.decoder(hidden, c)
                 out = torch.cat((out, p), dim=1)
             return out
         if ifEval:
