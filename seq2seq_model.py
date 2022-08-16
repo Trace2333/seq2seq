@@ -88,6 +88,7 @@ class seq2seqBase(nn.Module):
             y = y.to(torch.float32)
             y_in = y.permute(1, 0, 2)
             output1, c = self.encoder(x)
+            c = c.squeeze(0)
             out, hidden = self.decoder(y_in[0], c)
             for i in y_in[1:]:
                 if start_TF_rate > random.uniform(0, 1):    # All teacher forcing

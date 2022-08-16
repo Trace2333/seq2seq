@@ -266,8 +266,8 @@ def collate_fn(data):
     datasetEN = pickleRead(".\\datasets\\ENdataset.pkl")
     datasetZH = pickleRead(".\\datasets\\ZHdataset.pkl")
     X, Y = selectList(data)
-    batchedX = padToMaxlength(X, datasetEN, 40)
-    batchedY = padToMaxlength(Y, datasetZH, 40)
+    batchedX = padToMaxlength(X, datasetEN)
+    batchedY = padToMaxlength(Y, datasetZH)
     """if len(batchedX[0]) > len(batchedY[0]):    # 暂用，需要继续学习packedsequence做mask操作之后再取消
         batchedY = padToMaxlength(batchedY, datasetZH)
     if len(batchedX[0]) < len(batchedY[0]):
