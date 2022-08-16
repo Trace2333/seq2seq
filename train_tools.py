@@ -29,7 +29,7 @@ embwZH = torch.tensor(embwZH, dtype=torch.float32).to(device)
 
 epochs = 1
 evalEpochs = 0
-batchsize = 1
+batchsize = 16
 hiddensize = 300
 inputsize = 300
 lr = 2e-3

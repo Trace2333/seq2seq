@@ -15,14 +15,13 @@ class encoderBase(nn.Module):
         self.layers = numLayers
         self.batch = batchSize
         self.hiddenSize = hiddenSize
-        self.recurent = nn.RNN(inputSize, batch_first=True, bidirectional=False,
-                               num_layers=numLayers, hidden_size=hiddenSize)  # Using a 2 direction RNN to read the input sentences
+        self.recurent = nn.LSTM(inputSize, batch_first=True,
+                                num_layers=numLayers, hidden_size=hiddenSize)  # Using a 2 direction RNN to read the input sentences
 
     def forward(self, x):
         """前向传播"""
-        state = self.initNormState()
-        out = self.recurent(x, state)
-        return out
+        out, (hidden, cell) = self.recurent(x)
+        return hidden, cell
 
     def initZeroState(self):
         """零初始化隐藏层"""
@@ -45,15 +44,14 @@ class decoderBase(nn.Module):
         self.hiddenSize = hiddenSize
         self.inputSize = inputSize
         self.batchSize = batchSize
-        self.recurrent = nn.RNNCell(inputSize, hiddenSize, nonlinearity='tanh', bias=True)
+        self.recurrent = nn.LSTM(inputSize, hiddenSize, bias=True)
         self.linear = nn.Linear(in_features=hiddenSize, out_features=dictLen)
 
-    def forward(self, x, state):
+    def forward(self, x, in_hidden, in_cell):
         """前向计算"""
-        out = self.recurrent(x, state)
-        state = out
-        y = self.linear(out.unsqueeze(0).permute(1, 0, 2))
-        return y, state
+        out, (hidden, cell) = self.recurrent(x, (in_hidden, in_cell))
+        y = self.linear(out.permute(1, 0, 2))
+        return y, hidden, cell
 
     def initZeroState(self):
         """隐藏层零初始化"""
@@ -86,16 +84,15 @@ class seq2seqBase(nn.Module):
             y = nn.functional.embedding(torch.tensor(y).long().to(device), self.ZH)
             x = x.to(torch.float32)
             y = y.to(torch.float32)
-            y_in = y.permute(1, 0, 2)
-            output1, c = self.encoder(x)
-            c = c.squeeze(0)
-            out, hidden = self.decoder(y_in[0], c)
-            for i in y_in[1:]:
+            y = y.permute(1, 0, 2).split(1, dim=0)
+            hidden, cell = self.encoder(x)
+            out, hidden, cell = self.decoder(y[0], hidden, cell)
+            for i in y[1:]:
                 if start_TF_rate > random.uniform(0, 1):    # All teacher forcing
-                    p, hidden = self.decoder(i, c)
+                    p, hidden, cell = self.decoder(i, hidden, cell)
                 else:
-                    decode_in = nn.functional.embedding(out.split(1, dim=1)[-1].argmax(2), self.ZH).squeeze(1)
-                    p, hidden = self.decoder(decode_in, c)
+                    decode_in = nn.functional.embedding(out.split(1, dim=1)[-1].argmax(2), self.ZH).permute(1, 0, 2)
+                    p, hidden, cell = self.decoder(decode_in, hidden, cell)
                 out = torch.cat((out, p), dim=1)
             return out
         if ifEval:
