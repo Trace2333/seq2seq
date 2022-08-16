@@ -79,7 +79,7 @@ class seq2seqBase(nn.Module):
         self.ZH = nn.Parameter(embwZH)
         self.batchsize = batchSize
 
-    def forward(self, x, y, ifEval=False, start_TF_rate=0.9):
+    def forward(self, x, y, ifEval=False, start_TF_rate=0.7):
         """前向计算"""
         if ifEval is not True:
             x = nn.functional.embedding(torch.tensor(x).long().to(device), self.EN)
@@ -89,7 +89,7 @@ class seq2seqBase(nn.Module):
             y_in = y.permute(1, 0, 2)
             output1, c = self.encoder(x)
             c = c[0]
-            out, c = self.decoder(y_in[0], c)
+            out, hidden = self.decoder(y_in[0], c)
             for i in y_in[1:]:
                 if start_TF_rate > random.uniform(0, 1):    # All teacher forcing
                     p, hidden = self.decoder(i, c)
