@@ -29,10 +29,10 @@ embwZH = torch.tensor(embwZH, dtype=torch.float32).to(device)
 
 epochs = 1
 evalEpochs = 0
-batchsize = 32
+batchsize = 16
 hiddensize = 300
 inputsize = 300
-lr = 1e-2
+lr = 2e-3
 
 model = seq2seqBase(
     inputSize=inputsize,
@@ -43,6 +43,10 @@ model = seq2seqBase(
     embwEN=embwEN,
     embwZH=embwZH
 ).to(device)
+
+for i in model.modules():    # 参数初始化
+    if isinstance(i, torch.nn.Linear):
+        torch.nn.init.xavier_normal_(i.weight, gain=1)
 
 dataset1 = seqDataset(    # 数据准备
     tokensListEN=trainEN,

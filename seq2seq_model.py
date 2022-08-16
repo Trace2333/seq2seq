@@ -15,22 +15,22 @@ class encoderBase(nn.Module):
         self.layers = numLayers
         self.batch = batchSize
         self.hiddenSize = hiddenSize
-        self.recurent = nn.RNN(inputSize, batch_first=True, bidirectional=True,
+        self.recurent = nn.RNN(inputSize, batch_first=True, bidirectional=False,
                                num_layers=numLayers, hidden_size=hiddenSize)  # Using a 2 direction RNN to read the input sentences
 
     def forward(self, x):
         """前向传播"""
-        state = self.initZeroState()
+        state = self.initNormState()
         out = self.recurent(x, state)
         return out
 
     def initZeroState(self):
         """零初始化隐藏层"""
-        return torch.zeros(self.layers * 2, self.batch, self.hiddenSize).to(device)
+        return torch.zeros(self.layers, self.batch, self.hiddenSize).to(device)
 
     def initNormState(self):
         """正泰分布初始化隐藏层"""
-        return torch.randn([self.layers * 2, self.batch, self.hiddenSize]).to(device)
+        return torch.randn([self.layers, self.batch, self.hiddenSize]).to(device)
 
 
 class decoderBase(nn.Module):
@@ -79,7 +79,7 @@ class seq2seqBase(nn.Module):
         self.ZH = nn.Parameter(embwZH)
         self.batchsize = batchSize
 
-    def forward(self, x, y, ifEval=False, start_TF_rate=0.7):
+    def forward(self, x, y, ifEval=False, start_TF_rate=0.5):
         """前向计算"""
         if ifEval is not True:
             x = nn.functional.embedding(torch.tensor(x).long().to(device), self.EN)
@@ -88,13 +88,13 @@ class seq2seqBase(nn.Module):
             y = y.to(torch.float32)
             y_in = y.permute(1, 0, 2)
             output1, c = self.encoder(x)
-            c = c[0]
             out, hidden = self.decoder(y_in[0], c)
             for i in y_in[1:]:
                 if start_TF_rate > random.uniform(0, 1):    # All teacher forcing
                     p, hidden = self.decoder(i, c)
                 else:
-                    p, hidden = self.decoder(hidden, c)
+                    decode_in = nn.functional.embedding(out.split(1, dim=1)[-1].argmax(2), self.ZH).squeeze(1)
+                    p, hidden = self.decoder(decode_in, c)
                 out = torch.cat((out, p), dim=1)
             return out
         if ifEval:

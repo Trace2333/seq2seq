@@ -86,7 +86,7 @@ print(argparse)
 print(argparse.seed)"""
 
 import torch.nn as nn
-rnncell = nn.RNNCell(input_size=300, hidden_size=300, nonlinearity='tanh', bias=True)
+"""rnncell = nn.RNNCell(input_size=300, hidden_size=300, nonlinearity='tanh', bias=True)
 # 所有的四个参数,没有batch_first
 x = torch.randn([16, 30, 300])
 x = x.permute(1, 0, 2)
@@ -94,4 +94,17 @@ x = x.permute(1, 0, 2)
 hidden = torch.randn([16, 300])
 out = rnncell(x[0], hidden)
 print(out.size())
-print(x[0].size())
+print(x[0].size())"""
+
+
+inputs = torch.randn([16, 300])
+# 输入的数据模拟
+lstmcell = nn.LSTMCell(input_size=300, hidden_size=300)
+out, hidden = lstmcell(inputs)
+print("OUT size:", out.size())
+print("HIden size", hidden.size())
+lstm = nn.LSTM(input_size=300, hidden_size=300, bidirectional=True, batch_first=True)
+inputs2 = torch.randn([16, 30, 300])
+out, hidden = lstm(inputs2)
+print("LSTM out :", out.size())
+print("LSTM Hidden size:", hidden[1].size())
