@@ -32,7 +32,7 @@ evalEpochs = 0
 batchsize = 16
 hiddensize = 300
 inputsize = 300
-lr = 2e-3
+lr = 1e-3
 
 model = seq2seqBase(
     inputSize=inputsize,
@@ -94,7 +94,7 @@ for epoch in range(epochs):
             wandb.log({f"{name} Weight:": torch.mean(parms.data)})
             if parms.grad is not None:    # 屏蔽掉embedding Parameter
                 wandb.log({f"{name} Grad_Value:": torch.mean(parms.grad)})
-        iteration.set_postfix(loss='{:.6f}'.format(loss.item()), rouge1='{:.3f}'.format(rouge1))
+        iteration.set_postfix(loss='{:.6f}'.format(loss.item()), Acc='{:.3f}'.format(acc))
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

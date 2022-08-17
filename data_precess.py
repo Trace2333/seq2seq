@@ -174,7 +174,7 @@ def addUnknownWords(dataset, matrix, targetFile):
         os.mkdir(".\\embw")
     for word in dataset:
         if dataset[word] not in matrix:
-            matrix[dataset[word]] = np.asarray(np.random.uniform(-0.25, 0.25, 300), dtype=np.float32)
+            matrix[dataset[word]] = np.asarray(np.random.uniform(0, 0.25, 300), dtype=np.float32)
     if not os.path.exists(".\\embw\\" + targetFile):
         with open(".\\embw\\" + targetFile, 'wb') as f1:
             pickle.dump(matrix, f1)
@@ -336,19 +336,19 @@ def process():
     matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\seq2seq\\embw\\sgns.wiki.word",
                            trainZH)
     addUnknownWords(trainZH, matrix, "TrainZHembw.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\data\\original_data\\GoogleNews-vectors-negative300.txt",
+    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\models\\GoogleNews-vectors-negative300.txt",
                            trainEN)
     addUnknownWords(trainEN, matrix, "TrainENembw.pkl")
     matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\seq2seq\\embw\\sgns.wiki.word",
                            testZH)
     addUnknownWords(testZH, matrix, "EvalZHembw.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\data\\original_data\\GoogleNews-vectors-negative300.txt",
+    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\models\\GoogleNews-vectors-negative300.txt",
                            testEN)
     addUnknownWords(testEN, matrix, "EvalENembw.pkl")
     matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\seq2seq\\embw\\sgns.wiki.word",
                            ZH)
     addUnknownWords(ZH, matrix, "ZHembw.pkl")
     matrix = loadBinVector(
-        "C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\data\\original_data\\GoogleNews-vectors-negative300.txt",
+        "C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\models\\GoogleNews-vectors-negative300.txt",
         EN)
     addUnknownWords(EN, matrix, "ENembw.pkl")

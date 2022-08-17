@@ -98,8 +98,13 @@ print(x[0].size())"""
 
 
 inputs = torch.randn([16, 300])
+norm_in = torch.randn([16, 1, 300])
+norm_in = norm_in.permute(0, 2, 1)
 # 输入的数据模拟
 lstmcell = nn.LSTMCell(input_size=300, hidden_size=300)
+norm = nn.BatchNorm1d(300)
+norm_out = norm(norm_in)
+print("NormOu size::", norm_out.size())
 out, hidden = lstmcell(inputs)
 print("OUT size:", out.size())
 print("HIden size", hidden.size())
