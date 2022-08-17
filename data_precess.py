@@ -188,7 +188,7 @@ def dictTondarray(embw):
         embedding[i] = embw[i]
     return embedding
 
-def padToMaxlength(inputs, dataset, forced_length=None):
+def padToMaxlength(inputs, dataset, forced_length=None, ify=False):
     """
     将句子列表padding
     Args:
@@ -205,8 +205,10 @@ def padToMaxlength(inputs, dataset, forced_length=None):
     for i in inputs:
         for j in i:
             sen.append(dataset[j])
-        sen.append(datasetLen - 1)
-        sen.insert(0, 1)
+        if ify is True:
+            sen.append(datasetLen - 1)
+        if ify is False:
+            sen.insert(0, 1)
         inputList.append(sen)
         sen = []
     if forced_length is None:
@@ -266,8 +268,8 @@ def collate_fn(data):
     datasetEN = pickleRead(".\\datasets\\ENdataset.pkl")
     datasetZH = pickleRead(".\\datasets\\ZHdataset.pkl")
     X, Y = selectList(data)
-    batchedX = padToMaxlength(X, datasetEN)
-    batchedY = padToMaxlength(Y, datasetZH)
+    batchedX = padToMaxlength(X, datasetEN, ify=False)
+    batchedY = padToMaxlength(Y, datasetZH, ify=True)
     """if len(batchedX[0]) > len(batchedY[0]):    # 暂用，需要继续学习packedsequence做mask操作之后再取消
         batchedY = padToMaxlength(batchedY, datasetZH)
     if len(batchedX[0]) < len(batchedY[0]):
