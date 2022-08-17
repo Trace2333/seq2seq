@@ -106,8 +106,8 @@ class seq2seqBase(nn.Module):
             y = y.reshape([self.batchsize, 1, 300])
             while not torch.equal(y[0].argmax(1), EOS):
                 if out.size(1) == 1:
-                    output1, c = self.encoder(x)
-                y, c = self.decoder(y, c)
+                    hidden, cell = self.encoder(x)
+                y, hidden, cell = self.decoder(y.permute(1, 0, 2), hidden, cell)
                 out = torch.cat((out, y.argmax(2)), dim=1)
                 y = nn.functional.embedding(y.argmax(2), self.ZH)
             return out
