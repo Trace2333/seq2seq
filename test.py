@@ -114,7 +114,7 @@ out, hidden = lstm(inputs2)
 print("LSTM out :", out.size())
 print("LSTM Hidden size:", hidden[1].size())"""
 
-inputs = torch.randn([16, 30, 300])
+"""inputs = torch.randn([16, 30, 300])
 out1 = inputs.split(1, dim=1)
 s = 0
 for i in out1[1:]:
@@ -122,4 +122,10 @@ for i in out1[1:]:
 print(s)
 out2 = inputs.split(inputs.size()[1] - 1, dim=1)
 for i in out2:
-    print(i.size())
+    print(i.size())"""
+
+norm_in = torch.randn([16, 1, 300])
+norm_in = norm_in.permute(0, 2, 1)
+norm = nn.BatchNorm1d(300)
+norm_out = norm(norm_in)
+print("NormOu size::", norm_out.size())

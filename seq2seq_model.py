@@ -46,11 +46,13 @@ class decoderBase(nn.Module):
         self.batchSize = batchSize
         self.recurrent = nn.LSTM(inputSize, hiddenSize, bias=True)
         self.linear = nn.Linear(in_features=hiddenSize, out_features=dictLen)
-
+        self.activation = nn.ReLU(inplace=False)
     def forward(self, x, in_hidden, in_cell):
         """前向计算"""
         out, (hidden, cell) = self.recurrent(x, (in_hidden, in_cell))
-        y = self.linear(out.permute(1, 0, 2))
+        out = out.permute(1, 0, 2)
+        out = self.activation(out)
+        y = self.linear(out)
         return y, hidden, cell
 
     def initZeroState(self):
@@ -76,14 +78,17 @@ class seq2seqBase(nn.Module):
         self.EN = nn.Parameter(embwEN)
         self.ZH = nn.Parameter(embwZH)
         self.batchsize = batchSize
+        self.BN = nn.BatchNorm1d(300)
 
-    def forward(self, x, y, ifEval=False, start_TF_rate=1):
+    def forward(self, x, y, ifEval=False, start_TF_rate=0):
         """前向计算"""
         if ifEval is not True:
             x = nn.functional.embedding(torch.tensor(x).long().to(device), self.EN)
             y = nn.functional.embedding(torch.tensor(y).long().to(device), self.ZH)
             x = x.to(torch.float32)
             y = y.to(torch.float32)
+            x = self.BN(x.permute(0, 2, 1)).permute(0, 2, 1)
+            y = self.BN(y.permute(0, 2, 1)).permute(0, 2, 1)
             y = y.permute(1, 0, 2).split(1, dim=0)
             hidden, cell = self.encoder(x)
             out, hidden, cell = self.decoder(y[0], hidden, cell)

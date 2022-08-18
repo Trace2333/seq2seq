@@ -28,7 +28,7 @@ embwEN = torch.tensor(embwEN, dtype=torch.float32).to(device)
 embwZH = torch.tensor(embwZH, dtype=torch.float32).to(device)
 
 epochs = 1
-evalEpochs = 0
+evalEpochs = 1
 batchsize = 16
 hiddensize = 300
 inputsize = 300
@@ -98,8 +98,9 @@ for epoch in range(epochs):
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
-torch.save(model.state_dict(), ".\\seq2seq.pth")
+        if step == 5000:
+            break
+#torch.save(model.state_dict(), ".\\seq2seq.pth")
 
 for epoch in range(evalEpochs):
     y = model.ZH[1]
