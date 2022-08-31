@@ -6,6 +6,8 @@ from tqdm import tqdm
 from gensim.models import word2vec
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+
+
 def fileTolist(filename):
     """
     未处理文件转为list
@@ -23,6 +25,8 @@ def fileTolist(filename):
         tokens.append(t)
     enF.close()
     return tokens
+
+
 def dictCreate(tokens, targetFile, tokens1=None, tokens2=None):
     """
     建立token->id词典文件
@@ -58,6 +62,7 @@ def dictCreate(tokens, targetFile, tokens1=None, tokens2=None):
         print(targetFile + "Created!!!")
     else:
         print(targetFile + "Exists!!!")
+
 
 def sensToPaddedList(sens, dataset, forcedLen=None):
     """
@@ -96,6 +101,7 @@ def sensToPaddedList(sens, dataset, forcedLen=None):
         paddedIds.append(ids)
     return paddedIds
 
+
 def pickleRead(filename):
     """
     读取dataset
@@ -108,6 +114,7 @@ def pickleRead(filename):
     dataset = pickle.load(f)
     f.close()
     return dataset
+
 
 def word2vecModelCreate(fileName, targetFilename):
     """
@@ -130,6 +137,7 @@ def word2vecModelCreate(fileName, targetFilename):
             epochs=100
         )
         model.wv.save_word2vec_format(targetFilename)
+
 
 def loadBinVector(binvec, dataset):
     """
@@ -159,6 +167,7 @@ def loadBinVector(binvec, dataset):
                 #print(f"Precessed {n} Words")
         return matrix
 
+
 def addUnknownWords(dataset, matrix, targetFile):
     """
     添加在预训练词向量中没有的词到词嵌入表中，该词向量是随机生成的
@@ -182,11 +191,13 @@ def addUnknownWords(dataset, matrix, targetFile):
     else:
         print(targetFile + "Exists!!!")
 
+
 def dictTondarray(embw):
     embedding = np.zeros((len(embw) + 1, 300), dtype=np.float)
     for i in embw:
         embedding[i] = embw[i]
     return embedding
+
 
 def padToMaxlength(inputs, dataset, forced_length=None, ify=False):
     """
@@ -247,6 +258,7 @@ def padToMaxlength(inputs, dataset, forced_length=None, ify=False):
                     padded_list.append(padded_sentence)
             return padded_list
 
+
 def selectList(data):
     X = []
     Y = []
@@ -254,6 +266,7 @@ def selectList(data):
         X.append(i[0])
         Y.append(i[1])
     return X, Y
+
 
 def collate_fn(data):
     """
@@ -277,6 +290,7 @@ def collate_fn(data):
     batchedData = (batchedX, batchedY)
     return batchedData
 
+
 def evalcollate_fn(data):
     """
     自定义collate function
@@ -298,6 +312,7 @@ def evalcollate_fn(data):
         batchedX = padToMaxlength(batchedX, datasetEN)"""
     batchedData = (batchedX, batchedY)
     return batchedData
+
 
 def process():
     filenames = [

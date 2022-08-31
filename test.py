@@ -123,9 +123,44 @@ print(s)
 out2 = inputs.split(inputs.size()[1] - 1, dim=1)
 for i in out2:
     print(i.size())"""
-
+"""
 norm_in = torch.randn([16, 1, 300])
 norm_in = norm_in.permute(0, 2, 1)
 norm = nn.BatchNorm1d(300)
 norm_out = norm(norm_in)
 print("NormOu size::", norm_out.size())
+"""
+"""
+import random
+
+generator = random.random()
+a = generator    # 作为集束搜索的概率生成器
+
+
+"""
+
+
+"""filenames = [
+        ".\\cs_en\\train\\news-commentary-v13.zh-en.en",
+        ".\\cs_en\\train\\news-commentary-v13.zh-en.zh",
+        ".\\cs_en\\test\\newstest2017.tc.en",
+        ".\\cs_en\\test\\newstest2017.tc.zh",
+        ".\\cs_en\\dev\\newsdev2017.tc.zh",
+        ".\\cs_en\\dev\\newsdev2017.tc.en"
+    ]
+
+#dictCreate(fileTolist(filenames[0]), "Endataset.pkl", fileTolist(filenames[2]), fileTolist(filenames[5]))
+dataset1 = pickleRead(".\\datasets\\ENdataset.pkl")
+dataset2 = pickleRead(".\\datasets\\ZHdataset.pkl")
+print(dataset1)"""
+
+import heapq
+
+a = [[1, 2, 3], [2, 3, 4]]
+b = [[1, 2, 3], [2, 3, 4]]
+c = a + b
+d = []
+for i, j in zip(a, b):
+    s = i + j
+    d.append(s)
+print(d)
