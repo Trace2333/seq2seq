@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from data_precess import pickleRead, dictCreate, fileTolist
+from data_process import pickleRead, dictCreate, fileTolist
 
 """from transformers import BertModel
 T1 = torch.randn([4, 10, 30])

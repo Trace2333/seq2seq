@@ -6,4 +6,7 @@ embw/
 __pycache__/
 .idea/
 datasets/
-*.rar
+*.en
+*.zh
+*.txt
+*.word

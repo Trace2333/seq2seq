@@ -37,8 +37,8 @@ def dictCreate(tokens, targetFile, tokens1=None, tokens2=None):
     Return:
         无
     """
-    if not os.path.exists(".\\datasets"):
-        os.mkdir(".\\datasets")
+    if not os.path.exists(".\\hot_data\\data_dict"):
+        os.mkdir(".\\hot_data\\data_dict")
     tokensList = []
     datasetDict = {}
     for sentence in tokens:
@@ -56,8 +56,8 @@ def dictCreate(tokens, targetFile, tokens1=None, tokens2=None):
     for token, i in zip(tokensList, range(len(tokensList))):
         if token not in datasetDict:
             datasetDict[token] = i
-    if not os.path.exists(".\\datasets\\" + targetFile):
-        with open(".\\datasets\\" + targetFile, 'wb') as f1:
+    if not os.path.exists(".\\hot_data\\data_dict\\" + targetFile):
+        with open(".\\hot_data\\data_dict\\" + targetFile, 'wb') as f1:
             pickle.dump(datasetDict, f1)
         print(targetFile + "Created!!!")
     else:
@@ -126,9 +126,9 @@ def word2vecModelCreate(fileName, targetFilename):
         无
     """
     tokensList = fileTolist(fileName)
-    if not os.path.exists(".\\word2vec"):
-        os.mkdir(".\\word2vec")
-    if os.path.exists(".\\word2vec"):
+    if not os.path.exists(".\\hot_data\\word2vec"):
+        os.mkdir(".\\hot_data\\word2vec")
+    if os.path.exists(".\\hot_data\\word2vec"):
         model = word2vec.Word2Vec(
             sentences=tokensList,
             vector_size=300,
@@ -179,13 +179,13 @@ def addUnknownWords(dataset, matrix, targetFile):
     Return:
         无
     """
-    if not os.path.exists(".\\embw"):
-        os.mkdir(".\\embw")
+    if not os.path.exists(".\\hot_data\\embw"):
+        os.mkdir(".\\hot_data\\embw")
     for word in dataset:
         if dataset[word] not in matrix:
             matrix[dataset[word]] = np.asarray(np.random.uniform(0, 0.25, 300), dtype=np.float32)
-    if not os.path.exists(".\\embw\\" + targetFile):
-        with open(".\\embw\\" + targetFile, 'wb') as f1:
+    if not os.path.exists(".\\hot_data\\embw\\" + targetFile):
+        with open(".\\hot_data\\embw\\" + targetFile, 'wb') as f1:
             pickle.dump(matrix, f1)
         print(targetFile + "Created!!!")
     else:
@@ -268,104 +268,3 @@ def selectList(data):
     return X, Y
 
 
-def collate_fn(data):
-    """
-    自定义collate function
-    Args:
-        data: 由dataloader返回的数据，自动填入，
-    Note:
-        返回的是tokens，不是id
-    Return:
-        经过处理后的批数据
-    """
-    datasetEN = pickleRead(".\\datasets\\ENdataset.pkl")
-    datasetZH = pickleRead(".\\datasets\\ZHdataset.pkl")
-    X, Y = selectList(data)
-    batchedX = padToMaxlength(X, datasetEN, ify=False)
-    batchedY = padToMaxlength(Y, datasetZH, ify=True)
-    """if len(batchedX[0]) > len(batchedY[0]):    # 暂用，需要继续学习packedsequence做mask操作之后再取消
-        batchedY = padToMaxlength(batchedY, datasetZH)
-    if len(batchedX[0]) < len(batchedY[0]):
-        batchedX = padToMaxlength(batchedX, datasetEN)"""
-    batchedData = (batchedX, batchedY)
-    return batchedData
-
-
-def evalcollate_fn(data):
-    """
-    自定义collate function
-    Args:
-        data: 由dataloader返回的数据，自动填入，
-    Note:
-        返回的是tokens，不是id
-    Return:
-        经过处理后的批数据
-    """
-    datasetEN = pickleRead(".\\datasets\\ENdataset.pkl")
-    datasetZH = pickleRead(".\\datasets\\ZHdataset.pkl")
-    X, Y = selectList(data)
-    batchedX = padToMaxlength(X, datasetEN, 40)
-    batchedY = padToMaxlength(Y, datasetZH, 40)
-    """if len(batchedX[0]) > len(batchedY[0]):    # 暂用，需要继续学习packedsequence做mask操作之后再取消
-        batchedY = padToMaxlength(batchedY, datasetZH)
-    if len(batchedX[0]) < len(batchedY[0]):
-        batchedX = padToMaxlength(batchedX, datasetEN)"""
-    batchedData = (batchedX, batchedY)
-    return batchedData
-
-
-def process():
-    filenames = [
-        ".\\cs_en\\train\\news-commentary-v13.zh-en.en",
-        ".\\cs_en\\train\\news-commentary-v13.zh-en.zh",
-        ".\\cs_en\\test\\newstest2017.tc.en",
-        ".\\cs_en\\test\\newstest2017.tc.zh",
-        ".\\cs_en\\dev\\newsdev2017.tc.zh",
-        ".\\cs_en\\dev\\newsdev2017.tc.en"
-    ]
-    targetnames1 = [
-        "trainEN.pkl",
-        "trainZH.pkl",
-        "testEN.pkl",
-        "testZH.pkl",
-        "devZH.pkl",
-        "devEN.pkl"
-    ]
-    targetnames2 = [
-        "trainEN.pkl",
-        "trainZH.pkl",
-        "testEN.pkl",
-        "testZH.pkl",
-        "devZH.pkl",
-        "devEN.pkl"
-    ]
-    for i, j in zip(filenames, targetnames1):
-        dictCreate(fileTolist(i), j)
-    dictCreate(fileTolist(filenames[0]), "ENdataset.pkl", fileTolist(filenames[2]), fileTolist(filenames[5]))
-    dictCreate(fileTolist(filenames[1]), "ZHdataset.pkl", fileTolist(filenames[3]), fileTolist(filenames[4]))
-
-    trainZH = pickleRead(".\\datasets\\trainZH.pkl")
-    trainEN = pickleRead(".\\datasets\\trainEN.pkl")
-    testZH = pickleRead(".\\datasets\\testZH.pkl")
-    testEN = pickleRead(".\\datasets\\testEN.pkl")
-    EN = pickleRead(".\\datasets\\ENdataset.pkl")
-    ZH = pickleRead(".\\datasets\\ZHdataset.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\seq2seq\\embw\\sgns.wiki.word",
-                           trainZH)
-    addUnknownWords(trainZH, matrix, "TrainZHembw.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\models\\GoogleNews-vectors-negative300.txt",
-                           trainEN)
-    addUnknownWords(trainEN, matrix, "TrainENembw.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\seq2seq\\embw\\sgns.wiki.word",
-                           testZH)
-    addUnknownWords(testZH, matrix, "EvalZHembw.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\models\\GoogleNews-vectors-negative300.txt",
-                           testEN)
-    addUnknownWords(testEN, matrix, "EvalENembw.pkl")
-    matrix = loadBinVector("C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\seq2seq\\embw\\sgns.wiki.word",
-                           ZH)
-    addUnknownWords(ZH, matrix, "ZHembw.pkl")
-    matrix = loadBinVector(
-        "C:\\Users\\Trace\\Desktop\\Projects\\Keywords_Reaserch\\SRNN\\models\\GoogleNews-vectors-negative300.txt",
-        EN)
-    addUnknownWords(EN, matrix, "ENembw.pkl")

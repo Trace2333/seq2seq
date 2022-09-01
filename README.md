@@ -1,2 +1,3 @@
-# seq2seq
-复现seq2seq模型
+# Seq2Seq实验代码
+
+LSTM encoder + LSTM decoder
