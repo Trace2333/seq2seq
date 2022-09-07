@@ -1,6 +1,6 @@
 python3 train.py \
 	--batch_size=16 \
-	--lr=0.001 \
+	--lr=0.0001 \
 	--epochs=1 \
 	--evaluation_epochs=1 \
 	--optimizer=Adam \
@@ -10,6 +10,7 @@ python3 train.py \
 	--input_size=300 \
 	--hidden_size=300 \
 	--num_layers=1 \
+	--tf_rate=1 \
 	--if_load=False \
 	--if_save=False \
 	--load_para= \

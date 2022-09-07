@@ -65,6 +65,7 @@ def trainer_base(args=None):
         embwEN=embwEN,
         embwZH=embwZH,
         device=device,
+        start_TF_rate=args.tf_rate
     ).to(device)
     dataset1 = DatasetBase(  # 数据准备
         tokens_list_en=trainEN,
@@ -112,7 +113,7 @@ def trainer_base(args=None):
             out = model(batch[0], batch[1])
             y = torch.tensor(batch[1], dtype=torch.long).to(device)
             acc = acc_metrics(out.argmax(2), y)
-            out = out.permute(0 ,2, 1)
+            out = out.permute(0, 2, 1)
             loss = loss_fun(out, y) / args.batch_size
             wandb.log({"Acc:": acc})
             wandb.log({"Loss:": loss.item()})

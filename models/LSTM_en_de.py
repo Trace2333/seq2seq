@@ -87,7 +87,7 @@ class Seq2seqBase(nn.Module):
     利用EncoderBase和DecoderBase搭建
 
     """
-    def __init__(self, inputSize, hiddenSize, batchSize, numLayers, dictLen, embwEN, embwZH, device):
+    def __init__(self, inputSize, hiddenSize, batchSize, numLayers, dictLen, embwEN, embwZH, device, start_TF_rate):
         """层初始化"""
         super(Seq2seqBase, self).__init__()
         self.encoder = EncoderBase(inputSize, hiddenSize, batchSize, numLayers, device)
@@ -96,9 +96,10 @@ class Seq2seqBase(nn.Module):
         self.ZH = nn.Parameter(embwZH)
         self.batchsize = batchSize
         self.BN = nn.BatchNorm1d(300)
+        self.start_TF_rate = start_TF_rate
         self.device = device
 
-    def forward(self, x, y, ifEval=False, start_TF_rate=0):
+    def forward(self, x, y, ifEval=False):
         """前向计算"""
         if ifEval is not True:
             x = nn.functional.embedding(torch.tensor(x).long().to(self.device), self.EN)
@@ -111,7 +112,7 @@ class Seq2seqBase(nn.Module):
             hidden, cell = self.encoder(x)
             out, hidden, cell = self.decoder(y[0], hidden, cell)
             for i in y[1:]:
-                if start_TF_rate > random.uniform(0, 1):    # All teacher forcing
+                if self.start_TF_rate > random.uniform(0, 1):    # All teacher forcing
                     p, hidden, cell = self.decoder(i, hidden, cell)
                 else:
                     decode_in = nn.functional.embedding(out.split(1, dim=1)[-1].argmax(2), self.ZH).permute(1, 0, 2)

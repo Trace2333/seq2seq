@@ -7,7 +7,7 @@ args = ArgsParse()
 
 # 模型超参数
 
-args.batch_size =16
+args.batch_size = 16
 args.lr = 1e-3
 args.epochs = 1
 args.evaluation_epochs = 1
@@ -19,9 +19,9 @@ args.device = 'cuda'
 args.input_size = 300
 args.hidden_size = 300
 args.num_layers = 1
+args.tf_rate = 1
 
 # 文件操作
-
 args.train_file = "train.py"
 args.if_load = False
 args.if_save = False
