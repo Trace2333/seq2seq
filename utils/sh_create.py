@@ -9,10 +9,10 @@ def sh_create(sh_name, hyper_param):
     Return:
         无
     """
-    if not os.path.exists(".\\sh\\"):
-        os.mkdir(".\\sh\\")
-    with open(".\\sh\\" + sh_name, "w", encoding='utf8') as f:
-        f.write("python3 " + hyper_param["train_file"] + " \\" + "\n")
+    if not os.path.exists("./sh/"):
+        os.mkdir("./sh/")
+    with open("./sh/" + sh_name, "w", encoding='utf8') as f:
+        f.write("python3 " + hyper_param["train_file"] + " /" + "\n")
         for i in hyper_param:
             if i is not "train_file" and i is not "project":
                 f.write("\t")
@@ -21,9 +21,9 @@ def sh_create(sh_name, hyper_param):
                     f.write("cuda")
                 else:
                     f.write(str(hyper_param[i]))
-                f.write(" \\")
+                f.write(" /")
                 f.write("\n")
-    with open(".\\sh\\" + sh_name, "rb+") as f2:
+    with open("./sh/" + sh_name, "rb+") as f2:
         f2.seek(-4, os.SEEK_END)
         f2.truncate()
 

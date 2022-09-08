@@ -10,11 +10,11 @@ def load_config(model, target_path, para_name, if_load_or_not):
         如"/RNN_attention/"
         if_load_or_not: True/False
     """
-    if not os.path.exists(".\\check_points"):
-        os.mkdir(".\\check_points")
-    check_point = '.\\check_points'
-    if not os.path.exists('.\\check_points\\' + target_path):
-        os.mkdir('.\\check_points\\' + target_path)
+    if not os.path.exists("./check_points"):
+        os.mkdir("./check_points")
+    check_point = './check_points'
+    if not os.path.exists('./check_points/' + target_path):
+        os.mkdir('./check_points/' + target_path)
     if_load = if_load_or_not
     if os.path.exists(check_point + target_path + para_name) and if_load is True:    # 参数加载
         model.load_state_dict(torch.load(check_point + target_path+ para_name))

@@ -9,7 +9,7 @@ args = ArgsParse()
 
 args.batch_size = 16
 args.lr = 1e-3
-args.epochs = 1
+args.epochs = 20
 args.evaluation_epochs = 1
 args.optimizer = "Adam"
 args.lossfun = "CrossEntropyLoss"
@@ -19,14 +19,14 @@ args.device = 'cuda'
 args.input_size = 300
 args.hidden_size = 300
 args.num_layers = 1
-args.tf_rate = 1
+args.tf_rate = 0.5
 
 # 文件操作
 args.train_file = "train.py"
 args.if_load = False
-args.if_save = False
+args.if_save = True
 args.load_para = ""
-args.save_name = ""
+args.save_name = "epoch=20.pth"
 
 
 # wandb设置

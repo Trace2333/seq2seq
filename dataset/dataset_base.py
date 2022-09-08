@@ -46,8 +46,8 @@ def collate_fn(data):
     Return:
         经过处理后的批数据
     """
-    datasetEN = pickleRead(".\\hot_data\\data_dict\\ENdataset.pkl")
-    datasetZH = pickleRead(".\\hot_data\\data_dict\\ZHdataset.pkl")
+    datasetEN = pickleRead("./hot_data/data_dict/ENdataset.pkl")
+    datasetZH = pickleRead("./hot_data/data_dict/ZHdataset.pkl")
     X, Y = selectList(data)
     batchedX = padToMaxlength(X, datasetEN, ify=False)
     batchedY = padToMaxlength(Y, datasetZH, ify=True)
@@ -69,8 +69,8 @@ def evalcollate_fn(data):
     Return:
         经过处理后的批数据
     """
-    datasetEN = pickleRead(".\\hot_data\\data_dict\\ENdataset.pkl")
-    datasetZH = pickleRead(".\\hot_data\\data_dict\\ZHdataset.pkl")
+    datasetEN = pickleRead("./hot_data/data_dict/ENdataset.pkl")
+    datasetZH = pickleRead("./hot_data/data_dict/ZHdataset.pkl")
     X, Y = selectList(data)
     batchedX = padToMaxlength(X, datasetEN, 40)
     batchedY = padToMaxlength(Y, datasetZH, 40)

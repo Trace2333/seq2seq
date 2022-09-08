@@ -123,9 +123,5 @@ def trainer_base(args=None):
             loss.backward()
             optimizer.step()
 
-    if args.if_save is True and args.save_name:
-        y = model.ZH[1]
-        model.eval()
-        iteration = tqdm(evalLoader, desc="Running eval...")
-        for step, batch in enumerate(iteration):
-            out, y = model(batch[0], y, ifEval=True)
+    if args.if_save is True:
+        torch.save(model.state_dict(), "./check_points/base/" + args.save_name)
