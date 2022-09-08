@@ -11,3 +11,4 @@ datasets/
 *.txt
 *.word
 *.pkl
+origin_data/

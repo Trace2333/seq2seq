@@ -47,12 +47,12 @@ def trainer_base(args=None):
         print("Device unassigned...Using Cpu for training.")
         device = torch.device('cpu')
 
-    embwEN = dictTondarray(pickleRead(".\\hot_data\\embw\\ENembw.pkl"))
-    embwZH = dictTondarray(pickleRead(".\\hot_data\\embw\\ZHembw.pkl"))
-    trainEN = fileTolist(".\\origin_data\\cs_en\\train\\news-commentary-v13.zh-en.en")
-    trainZH = fileTolist(".\\origin_data\\cs_en\\train\\news-commentary-v13.zh-en.zh")
-    testEN = fileTolist(".\\origin_data\\cs_en\\test\\newstest2017.tc.en")
-    testZH = fileTolist(".\\origin_data\\cs_en\\test\\newstest2017.tc.zh")
+    embwEN = dictTondarray(pickleRead("./hot_data/embw/ENembw.pkl"))
+    embwZH = dictTondarray(pickleRead("./hot_data/embw/ZHembw.pkl"))
+    trainEN = fileTolist("./origin_data/cs_en/train/news-commentary-v13.zh-en.en")
+    trainZH = fileTolist("./origin_data/cs_en/train/news-commentary-v13.zh-en.zh")
+    testEN = fileTolist("./origin_data/cs_en/test/newstest2017.tc.en")
+    testZH = fileTolist("./origin_data/cs_en/test/newstest2017.tc.zh")
     embwEN = torch.tensor(embwEN, dtype=torch.float32).to(device)
     embwZH = torch.tensor(embwZH, dtype=torch.float32).to(device)
 

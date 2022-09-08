@@ -37,8 +37,8 @@ def dictCreate(tokens, targetFile, tokens1=None, tokens2=None):
     Return:
         无
     """
-    if not os.path.exists(".\\hot_data\\data_dict"):
-        os.mkdir(".\\hot_data\\data_dict")
+    if not os.path.exists("./hot_data/data_dict"):
+        os.mkdir("./hot_data/data_dict")
     tokensList = []
     datasetDict = {}
     for sentence in tokens:
@@ -56,8 +56,8 @@ def dictCreate(tokens, targetFile, tokens1=None, tokens2=None):
     for token, i in zip(tokensList, range(len(tokensList))):
         if token not in datasetDict:
             datasetDict[token] = i
-    if not os.path.exists(".\\hot_data\\data_dict\\" + targetFile):
-        with open(".\\hot_data\\data_dict\\" + targetFile, 'wb') as f1:
+    if not os.path.exists("./hot_data/data_dict/" + targetFile):
+        with open("./hot_data/data_dict/" + targetFile, 'wb') as f1:
             pickle.dump(datasetDict, f1)
         print(targetFile + "Created!!!")
     else:
@@ -126,9 +126,9 @@ def word2vecModelCreate(fileName, targetFilename):
         无
     """
     tokensList = fileTolist(fileName)
-    if not os.path.exists(".\\hot_data\\word2vec"):
-        os.mkdir(".\\hot_data\\word2vec")
-    if os.path.exists(".\\hot_data\\word2vec"):
+    if not os.path.exists("./hot_data/word2vec"):
+        os.mkdir("./hot_data/word2vec")
+    if os.path.exists("./hot_data/word2vec"):
         model = word2vec.Word2Vec(
             sentences=tokensList,
             vector_size=300,
@@ -179,13 +179,13 @@ def addUnknownWords(dataset, matrix, targetFile):
     Return:
         无
     """
-    if not os.path.exists(".\\hot_data\\embw"):
-        os.mkdir(".\\hot_data\\embw")
+    if not os.path.exists("./hot_data/embw"):
+        os.mkdir("./hot_data/embw")
     for word in dataset:
         if dataset[word] not in matrix:
             matrix[dataset[word]] = np.asarray(np.random.uniform(0, 0.25, 300), dtype=np.float32)
-    if not os.path.exists(".\\hot_data\\embw\\" + targetFile):
-        with open(".\\hot_data\\embw\\" + targetFile, 'wb') as f1:
+    if not os.path.exists("./hot_data/embw/" + targetFile):
+        with open("./hot_data/embw/" + targetFile, 'wb') as f1:
             pickle.dump(matrix, f1)
         print(targetFile + "Created!!!")
     else:
