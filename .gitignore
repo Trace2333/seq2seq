@@ -12,3 +12,4 @@ datasets/
 *.word
 *.pkl
 origin_data/
+*.out

@@ -9,7 +9,7 @@ args = ArgsParse()
 
 args.batch_size = 16
 args.lr = 1e-3
-args.epochs = 20
+args.epochs = 2
 args.evaluation_epochs = 1
 args.optimizer = "Adam"
 args.lossfun = "CrossEntropyLoss"
@@ -19,19 +19,19 @@ args.device = 'cuda'
 args.input_size = 300
 args.hidden_size = 300
 args.num_layers = 1
-args.tf_rate = 0.5
+args.tf_rate = 1
 
 # 文件操作
 args.train_file = "train.py"
 args.if_load = False
 args.if_save = True
 args.load_para = ""
-args.save_name = "epoch=20.pth"
+args.save_name = "epoch=2_tf=1.pth"
 
 
 # wandb设置
 args.project = "seq2seq-LSTM-base"
-args.notes = "Fro test in the rewrite progress"
+args.notes = "epoch=2,代码已改"
 
 sh_create("run.sh", json_create(args))
 trainer_base(args)

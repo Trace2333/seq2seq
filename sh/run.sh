@@ -1,7 +1,7 @@
 python3 train.py /
 	--batch_size=16 /
 	--lr=0.001 /
-	--epochs=20 /
+	--epochs=2 /
 	--evaluation_epochs=1 /
 	--optimizer=Adam /
 	--lossfun=CrossEntropyLoss /
@@ -10,9 +10,9 @@ python3 train.py /
 	--input_size=300 /
 	--hidden_size=300 /
 	--num_layers=1 /
-	--tf_rate=0.5 /
+	--tf_rate=1 /
 	--if_load=False /
 	--if_save=True /
 	--load_para= /
-	--save_name=epoch=20.pth /
-	--notes=Fro test in the rewrite progres
+	--save_name=epoch=2_tf=1.pth /
+	--notes=epoch=2,代码已�

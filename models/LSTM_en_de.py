@@ -99,40 +99,36 @@ class Seq2seqBase(nn.Module):
         self.start_TF_rate = start_TF_rate
         self.device = device
 
-    def forward(self, x, y, ifEval=False):
+    def forward(self, x, y):
         """前向计算"""
-        if ifEval is not True:
-            x = nn.functional.embedding(torch.tensor(x).long().to(self.device), self.EN)
-            y = nn.functional.embedding(torch.tensor(y).long().to(self.device), self.ZH)
-            x = x.to(torch.float32)
-            y = y.to(torch.float32)
-            x = self.BN(x.permute(0, 2, 1)).permute(0, 2, 1)
-            y = self.BN(y.permute(0, 2, 1)).permute(0, 2, 1)
-            y = y.permute(1, 0, 2).split(1, dim=0)
-            hidden, cell = self.encoder(x)
-            out, hidden, cell = self.decoder(y[0], hidden, cell)
-            for i in y[1:]:
-                if self.start_TF_rate > random.uniform(0, 1):    # All teacher forcing
-                    p, hidden, cell = self.decoder(i, hidden, cell)
-                else:
-                    decode_in = nn.functional.embedding(out.split(1, dim=1)[-1].argmax(2), self.ZH).permute(1, 0, 2)
-                    p, hidden, cell = self.decoder(decode_in, hidden, cell)
-                out = torch.cat((out, p), dim=1)
-            return out
-        if ifEval:
-            x = nn.functional.embedding(torch.tensor(x).long().to(self.device), self.EN)
-            x = x.to(torch.float32)
-            y = y.to(torch.float32).unsqueeze(0)
-            out = torch.full([self.batchsize, 1], 1).to(self.device)
-            EOS = torch.tensor(len(self.ZH) - 1).to(self.device)
-            for i in range(31):
-                y = torch.cat((y, self.EN[1].unsqueeze(0)), dim=0)
-            y = y.reshape([self.batchsize, 1, 300])
-            while not torch.equal(y[0].argmax(1), EOS):
-                if out.size(1) == 1:
-                    hidden, cell = self.encoder(x)
-                y, hidden, cell = self.decoder(y.permute(1, 0, 2), hidden, cell)
-                out = torch.cat((out, y.argmax(2)), dim=1)
-                y = nn.functional.embedding(y.argmax(2), self.ZH)
-            return out
+        x = nn.functional.embedding(torch.tensor(x).long().to(self.device), self.EN)
+        y = nn.functional.embedding(torch.tensor(y).long().to(self.device), self.ZH)
+        x = x.to(torch.float32)
+        y = y.to(torch.float32)
+        y = y.permute(1, 0, 2).split(1, dim=0)
+        hidden, cell = self.encoder(x)
+        out, hidden, cell = self.decoder(y[0], hidden, cell)
+        for i in y[1:]:
+            if self.start_TF_rate > random.uniform(0, 1):    # All teacher forcing
+                p, hidden, cell = self.decoder(i, hidden, cell)
+            else:
+                decode_in = nn.functional.embedding(out.split(1, dim=1)[-1].argmax(2), self.ZH).permute(1, 0, 2)
+                p, hidden, cell = self.decoder(decode_in, hidden, cell)
+            out = torch.cat((out, p), dim=1)
+        return out
+
+    def evaluation(self, x):
+        x = nn.functional.embedding(torch.tensor(x).long().to(self.device), self.EN)
+        x = x.to(torch.float32)
+        out = torch.full([self.batchsize, 1], 1).to(self.device)
+        eos = torch.tensor(len(self.ZH) - 1).to(self.device)
+        hidden, cell = self.encoder(x)  # 初始语义向量
+        pred_input = torch.full([self.batchsize, 1], 1).to(self.device)
+        while torch.equal(out.split(1, dim=1)[-1][0], eos) is False and out.size()[1] != x.size()[1]:
+            pred_input = nn.functional.embedding(pred_input, self.ZH)
+            pred_input, hidden, cell = self.decoder(pred_input.permute(1, 0, 2), hidden, cell)
+            pred_input = pred_input.argmax(2)
+            out = torch.cat((out, pred_input), dim=1)
+        return out
+
 

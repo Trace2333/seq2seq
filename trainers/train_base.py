@@ -67,6 +67,7 @@ def trainer_base(args=None):
         device=device,
         start_TF_rate=args.tf_rate
     ).to(device)
+    
     dataset1 = DatasetBase(  # 数据准备
         tokens_list_en=trainEN,
         tokens_list_zh=trainZH
@@ -108,6 +109,7 @@ def trainer_base(args=None):
     loss_fun = nn.CrossEntropyLoss()   # NER状态下只能使用交叉熵
     for epoch in range(args.epochs):
         iteration = tqdm(trainLoader, desc="Running training..")
+
         model.train()
         for step, batch in enumerate(iteration):
             out = model(batch[0], batch[1])
@@ -115,13 +117,20 @@ def trainer_base(args=None):
             acc = acc_metrics(out.argmax(2), y)
             out = out.permute(0, 2, 1)
             loss = loss_fun(out, y) / args.batch_size
-            wandb.log({"Acc:": acc})
+            wandb.log({"Train Acc:": acc})
             wandb.log({"Loss:": loss.item()})
             iteration.set_postfix(loss='{:.6f}'.format(loss.item()))
-
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+
+        model.eval()
+        iteration = tqdm(evalLoader, desc="Running eval...")
+        for step, batch in enumerate(iteration):
+            y = torch.tensor(batch[1], dtype=torch.long).to(device)
+            out = model.evaluation(batch[0])
+            acc = acc_metrics(out, y)
+            wandb.log({"Eval Acc:": acc})
 
     if args.if_save is True:
         torch.save(model.state_dict(), "./check_points/base/" + args.save_name)
