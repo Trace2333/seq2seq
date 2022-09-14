@@ -1,7 +1,8 @@
+from base64 import decode
 import torch
 import random
 import torch.nn as nn
-
+from attention import SelfDotProductAttention
 
 class EncoderBase(nn.Module):
     """
@@ -147,6 +148,13 @@ class Seq2seqBaseWithoutEmbw(nn.Module):
         self.embeddingZH = nn.Embedding(ZH_size, inputSize)
         self.en_size = EN_size
         self.zh_size = ZH_size
+        self.attention = SelfDotProductAttention(
+            input_size=inputSize,
+            v_size=128,
+            k_size=128,
+            q_size=128,
+            drop_rate=0.5
+        )
 
     def forward(self, x, y):
         """输入更正，输入变更为id列表，经过nn.embedding直接词嵌入化"""
@@ -157,9 +165,11 @@ class Seq2seqBaseWithoutEmbw(nn.Module):
         out, hidden, cell = self.decoder(y[0], hidden, cell)
         for i in y[1:]:
             if self.tf > random.uniform(0, 1):  # All teacher forcing
+                i = self.attention(i)
                 p, hidden, cell = self.decoder(i, hidden, cell)
             else:
                 decode_in = self.embeddingZH(out.split(1, dim=1)[-1].argmax(2)).permute(1, 0, 2)
+                decode_in = self.attention(decode_in)
                 p, hidden, cell = self.decoder(decode_in, hidden, cell)
             out = torch.cat((out, p), dim=1)
         return out
