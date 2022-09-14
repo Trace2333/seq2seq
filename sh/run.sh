@@ -1,18 +1,18 @@
 python3 train.py /
-	--batch_size=16 /
+	--batch_size=32 /
 	--lr=0.001 /
-	--epochs=2 /
-	--evaluation_epochs=1 /
+	--epochs=10 /
 	--optimizer=Adam /
 	--lossfun=CrossEntropyLoss /
 	--model_name=seq2seq_base /
 	--device=cuda /
+	--evaluation_epochs=1 /
 	--input_size=300 /
 	--hidden_size=300 /
 	--num_layers=1 /
-	--tf_rate=1 /
+	--tf_rate=0.6 /
 	--if_load=False /
 	--if_save=True /
 	--load_para= /
-	--save_name=epoch=2_tf=1.pth /
-	--notes=epoch=2,代码已�
+	--save_name=epoch=10_tf=1_lr=1e-3.pth /
+	--notes=epoch=10,lr=1e-3,tf=

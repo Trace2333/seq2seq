@@ -132,3 +132,47 @@ class Seq2seqBase(nn.Module):
         return out
 
 
+
+class Seq2seqBaseWithoutEmbw(nn.Module):
+    """同基础版seq2seq模型，删除了其中的中文英文分别做词嵌入"""
+    def __init__(self, inputSize, hiddenSize, batchSize, numLayers, device, start_TF_rate, EN_size, ZH_size):
+        super(Seq2seqBaseWithoutEmbw, self).__init__()
+        self.encoder = EncoderBase(inputSize, hiddenSize, batchSize, numLayers, device)
+        self.decoder = DecoderBase(inputSize, hiddenSize, batchSize, numLayers, ZH_size, device)  # 取最后一个输入的隐层状态作为语义向量
+        self.device = device
+        self.batch_size = batchSize
+        self.tf = start_TF_rate
+        self.ln = nn.LayerNorm
+        self.embeddingEN = nn.Embedding(EN_size, inputSize)
+        self.embeddingZH = nn.Embedding(ZH_size, inputSize)
+        self.en_size = EN_size
+        self.zh_size = ZH_size
+
+    def forward(self, x, y):
+        """输入更正，输入变更为id列表，经过nn.embedding直接词嵌入化"""
+        x = self.embeddingEN(torch.tensor(x, dtype=torch.int).to(self.device))
+        y = self.embeddingZH(torch.tensor(y, dtype=torch.int).to(self.device))
+        y = y.permute(1, 0, 2).split(1, dim=0)
+        hidden, cell = self.encoder(x)
+        out, hidden, cell = self.decoder(y[0], hidden, cell)
+        for i in y[1:]:
+            if self.tf > random.uniform(0, 1):  # All teacher forcing
+                p, hidden, cell = self.decoder(i, hidden, cell)
+            else:
+                decode_in = self.embeddingZH(out.split(1, dim=1)[-1].argmax(2)).permute(1, 0, 2)
+                p, hidden, cell = self.decoder(decode_in, hidden, cell)
+            out = torch.cat((out, p), dim=1)
+        return out
+
+    def evaluation(self, x):
+        x = self.embeddingEN(torch.tensor(x, dtype=torch.int).to(self.device))
+        out = torch.full([self.batch_size, 1], 1).to(self.device)
+        eos = torch.tensor(self.zh_size - 1).to(self.device)
+        hidden, cell = self.encoder(x)  # 初始语义向量
+        pred_input = torch.full([self.batch_size, 1], 1).to(self.device)
+        while torch.equal(out.split(1, dim=1)[-1][0], eos) is False and out.size()[1] != x.size()[1]:
+            pred_input = self.embeddingZH(pred_input)
+            pred_input, hidden, cell = self.decoder(pred_input.permute(1, 0, 2), hidden, cell)
+            pred_input = pred_input.argmax(2)
+            out = torch.cat((out, pred_input), dim=1)
+        return out
